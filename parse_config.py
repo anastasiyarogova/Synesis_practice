@@ -3,29 +3,30 @@ import os.path
 import configparser
 
 setup(
-    name='my_module',
+    name='parse_config',
     version='1.0',
     packages=find_packages(),
     install_requires=[
         'configparser',
         'pandas',
-        'matplotlib'
+        'matplotlib',
+        'sklearn',
+        'numpy',
+        'seaborn'
     ],
     entry_points={
         'console_scripts': [
-            'my_module=my_module:main'
+            'parse_config=parse_config:main'
         ]
     }
 )
 
 config_file_name = "credentials.ini"
-
-#path = r'C:\Users\anast\PycharmProjects\Practice'
-
-config_folder = os.path.abspath(os.path.dirname('Practice'))
+path = r'C:\Users\anast\PycharmProjects\Practice'
+#config_folder = os.path.abspath(os.path.dirname('Practice'))
 
 # полный путь к конфигурационному файлу
-config_file_path = os.path.join(config_folder, config_file_name)
+config_file_path = os.path.join(path, config_file_name)
 
 config = configparser.ConfigParser()
 config.read(config_file_path)
@@ -36,11 +37,8 @@ password = config.get('credentials', 'password')
 
 # установка пакетов
 import subprocess
-
-# список необходимых пакетов
 required_packages = ['pandas', 'matplotlib', 'sklearn', 'numpy', 'seaborn']
 
-# проверяем, установлены ли требуемые пакеты
 for package in required_packages:
     try:
         import package
