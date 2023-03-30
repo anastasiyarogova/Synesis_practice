@@ -1,8 +1,18 @@
-import configparser
+import json
 
-config = configparser.ConfigParser()
-config['credentials'] = {'URL': '*link*',
-                     'username': 'hello_im_user',
-                     'password': 'SECRET'}
+with open('credentials.json', 'w') as f:
+    print("The json file is created")
 
-with open('credentials.ini', 'w') as configfile: config.write(configfile)
+config = {'database_name': 'PostgreSQL',
+          'user_name': 'hello_im_user',
+          'password': 'SECRET',
+          'client_email': '***'}
+
+
+with open('credentials.json', 'w') as f:
+    json.dump(config, f,  sort_keys=True, indent=2)
+
+with open('credentials.json') as f:
+    print(f.read())
+
+
