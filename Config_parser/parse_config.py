@@ -28,11 +28,13 @@ from google.oauth2 import service_account
 #    }
 # )
 class Connector:
-    def connect_DBMS(self, DB, query, credentials):
+    def connect_DBMS(self, DB, query, desktop_user, data):
         global df
         if DB == 'PostgreSQL':
+
             # Подключение к существующей базе данных
-            connection = psycopg2.connect(credentials)
+            connection = psycopg2.connect(database=data['database_name'],
+                                          password=data['password'], user=data['user_name'])
             # Курсор для выполнения операций с базой данных
             cursor = connection.cursor()
             cursor.execute(query)
@@ -46,10 +48,12 @@ class Connector:
             #    'https://www.googleapis.com/auth/cloud-platform',
             #    'https://www.googleapis.com/auth/drive',
             # ]
+            credentials = service_account.Credentials.from_service_account_file(desktop_user)
             df = pandas_gbq.read_gbq(query, project_id='project_name', credentials=credentials)
 
         elif DB == 'ClickHouse':
-            client = clickhouse_connect.get_client(credentials)
+            client = clickhouse_connect.get_client(database=data['database_name'],
+                                          password=data['password'], user=data['user_name'])
             client.command(query)
             df = client.query(query)
         return df
@@ -61,16 +65,16 @@ print(os.path.expanduser('~'))
 desktop_user = os.path.expanduser("~\PycharmProjects\Practice\Config_parser\credentials.json")
 print(desktop_user)
 
-credentials = service_account.Credentials.from_service_account_file(desktop_user)
-#credentials = service_account.Credentials.from_service_account_file('/Users/anast/PycharmProjects/Practice/Config_parser/credentials.json')
 
 with open('credentials.json') as f:
     data = json.load(f)
 DB = data['database_name']
+print(data)
+print(type(data))
 print(DB)
 
 connect = Connector()
-df = connect.connect_DBMS(DB, query, credentials)
+df = connect.connect_DBMS(DB, query, desktop_user, data)
 
 
 # установка пакетов
