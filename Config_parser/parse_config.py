@@ -1,34 +1,13 @@
 import pandas_gbq
 import psycopg2
 import clickhouse_connect
-import os
-# from setuptools import setup, find_packages
-# import os.path
-# import configparser
+import os.path
 import json
 from google.oauth2 import service_account
 
 
-# setup(
-#    name='parse_config',
-#    version='1.0',
-#    packages=find_packages(),
-#    install_requires=[
-#        'configparser',
-#        'pandas',
-#        'matplotlib',
-#        'sklearn',
-#        'numpy',
-#        'seaborn'
-#    ],
-#    entry_points={
-#        'console_scripts': [
-#            'parse_config=parse_config:main'
-#        ]
-#    }
-# )
 class Connector:
-    def connect_DBMS(self, DB, query, desktop_user, data):
+    def connect_dbms(self, DB, query, desktop_user, data):
         global df
         if DB == 'PostgreSQL':
 
@@ -53,18 +32,25 @@ class Connector:
 
         elif DB == 'ClickHouse':
             client = clickhouse_connect.get_client(database=data['database_name'],
-                                          password=data['password'], user=data['user_name'])
+                                                   password=data['password'], user=data['user_name'])
             client.command(query)
             df = client.query(query)
         return df
 
-query = """SELECT * 
-FROM loto-analytics.belbet.client_events_production """
+# установка пакетов для аналитики
+import subprocess
+
+required_packages = ['pandas', 'matplotlib', 'sklearn', 'numpy', 'seaborn']
+
+for package in required_packages:
+    try:
+        import package
+    except ImportError:
+        subprocess.check_call(['pip', 'install', package])
 
 print(os.path.expanduser('~'))
-desktop_user = os.path.expanduser("~\PycharmProjects\Practice\Config_parser\credentials.json")
+desktop_user = os.path.expanduser("~/PycharmProjects/Practice/Config_parser/credentials.json")
 print(desktop_user)
-
 
 with open('credentials.json') as f:
     data = json.load(f)
@@ -73,16 +59,12 @@ print(data)
 print(type(data))
 print(DB)
 
-connect = Connector()
-df = connect.connect_DBMS(DB, query, desktop_user, data)
 
+# Тестирование модуля
+if __name__ == "__main__":
 
-# установка пакетов
-import subprocess
-required_packages = ['pandas', 'matplotlib', 'sklearn', 'numpy', 'seaborn']
+    query = """SELECT *
+    FROM loto-analytics.belbet.client_events_production """
 
-for package in required_packages:
-    try:
-        import package
-    except ImportError:
-        subprocess.check_call(['pip', 'install', package])
+    connect = Connector()
+    df = connect.connect_dbms(DB, query, desktop_user, data)

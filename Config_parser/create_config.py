@@ -10,10 +10,7 @@ config = {'database_name': 'PostgreSQL',
 
 
 with open('credentials.json', 'w') as f:
-    json.dump(config, f,  sort_keys=True, indent=2)
+    json.dump(config, f, sort_keys=True, indent=2)
 
 with open('credentials.json') as f:
     print(f.read())
-
-
-
